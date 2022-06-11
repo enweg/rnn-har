@@ -1,0 +1,2 @@
+Data was obtained from https://realized.oxford-man.ox.ac.uk/data
+See github https://github.com/enweg/rnn-har for more information

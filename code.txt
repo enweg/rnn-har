@@ -1,0 +1,1 @@
+Code can also be found at https://github.com/enweg/rnn-har with instructions on how to replicate findings

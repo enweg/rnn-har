@@ -70,7 +70,6 @@ end
 # Data
 # 
 # Notes: 
-# - Only loaded to get dimensions right
 # ------------------------------------------------------------------------------
 
 df = load_data()
@@ -84,10 +83,6 @@ train, validate, test = split_train_validate_test(x, y, dates[2:end])
 # Data Simulation
 # 
 # Notes: 
-# - We will simulate a HAR model with three states among which we smoothly
-#   transition using sigmoid function.
-# - Although this might not exactly be the form of time variation present in the
-#   data, it does represent a often used way of modelling time variation.
 # ------------------------------------------------------------------------------
 
 function simulate(n, rng)
@@ -131,11 +126,6 @@ savefig(p, "./outputs/simulations-beta.pdf")
 # OLS
 # 
 # Notes: 
-# - We will first check what performance we would obtain using standard OLS
-#   estimates.
-# - The OLS coefficients are essentially weighted averages of the true state
-#   coefficients and are thus smoothing our the dynamics. 
-# - Using OLS, we obtain an in-sample RMSE of 1.047
 # ------------------------------------------------------------------------------
 
 xdaily = y
@@ -160,19 +150,6 @@ serialize("./outputs/simulations-ols-rmse.jld", rmse)
 # RNN-HAR MAP
 # 
 # Notes: 
-# - We know that the true state transitions are dependent on the monthly moving
-#   average. Thus, we will use subsequences of length 22 here. 
-# - As a sanity check, we will again first check the MAP results. We can then
-#   use this MAP point as a warm start to our chain. 
-# - Using the MAP estimate, we obtain a RMSE of 1.022. This is a mere 2.4
-#   percent better than the OLS estimate 
-# - Although the coefficient estimates seem to match the trends, their
-#   maginitudes are somewhat off. The time variation in the weekly coefficient
-#   is hardly matched at all. This might be due to the high correlation in the
-#   daily, weekly, and monthly variables due to taking rolling averages. Thus,
-#   we might be able to explain the data almost as well without clear time
-#   variation in the weekly coefficient. This could become a serious problem in
-#   the applied work.  
 # ------------------------------------------------------------------------------
 Random.seed!(6150533)
 rnntensor = make_rnn_tensor(datamat, 22)
@@ -215,15 +192,6 @@ savefig(p, "./outputs/simulations-map-time-variation.pdf")
 # Variational Inference
 # 
 # Notes: 
-# - Since MCMC is often very difficult in NNs and probably even worse in RNNs,
-#   VI is the default choice to obtain some sort of uncertainty estimates. Here
-#   I will focus on Bayes By Backprop as impmeneted in BFlux.
-# - The Variational Family used is a Gaussian. 
-# - The VI approach results in an rmse of 1.016 which is better than the ols
-#   approach and better than the MAP estimate. 
-# - The quantile comparison plot shows an almost perfect match. WARNING only
-#   done on in-sample data. 
-# - BBB might be a good method to be used on real data. 
 # ------------------------------------------------------------------------------
 
 Random.seed!(6150533)
@@ -262,18 +230,6 @@ savefig(p, "./outputs/simulations-bbb-qqplot.pdf")
 # RNN-HAR Full Bayesian
 # 
 # Notes: 
-# - While SGNHTS is good when everything is set right, it is not trivial to set
-#   the settings right (although this seems to be neglected in the original
-#   paper). The first setting is the stepsize, which, although a thermostat is
-#   used, as a large impact on the mean kinetic energy, which we need to be
-#   around 1. So in order to obtain a good stepsize, I will use a bisection
-#   method to find a stepsize that results in an acceptable mean kinetic energy.
-#   Ones we have found such a stepsize, we can continue sampling for longer and
-#   calculate the mixing rates in the network output/ HAR coefficient space. We
-#   are unlikely to mix well in the network parameter space since the model is
-#   unidentified. The remaining free parameters are the friction and μ, both of
-#   which were set somewhat in line with the paper.  
-# - RMSE: 1.015 and a very good match in the quantile plot was achieved.
 # ------------------------------------------------------------------------------
 
 # SGNHT -

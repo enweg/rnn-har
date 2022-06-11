@@ -93,17 +93,6 @@ train, validate, test = split_train_validate_test(x, y, dates[2:end])
 # Notes: 
 # - Since we are lazy and we already have BFlux to do flexible Bayesian
 #   analysis, we will implement linear regression as a single linear layer NN.
-# - From Corsi(2009) we would expext the coefficient to be somewhere between
-#   zero and 1, or even more precise somewhere between 0 and 0.5. We will
-#   therefore use a Gaussian prior with mean zero and standard deviation 0.5. 
-# - We will use a Gaussian likelihood (as an alternative we could use a
-#   T-likelihood). For the standard deviation we will use a Gamma(2.0, 0.5)
-#   prior which has a mean of 1.0 and has 90% of its probability mass between
-#   0.18 and 1.94. This is probably a much too wide prior for this application,
-#   but that is better than artifically enforcing too narror priors.
-# - For all methods that need an initial value, we will use a Normal(0, 0.5)
-#   initialisation. This is the same as the prior on the coefficient here since
-#   no hidden state network parameters exist.
 # ------------------------------------------------------------------------------
 model = Flux.Chain(Dense(3, 1))
 nc = destruct(model)

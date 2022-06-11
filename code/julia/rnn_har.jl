@@ -79,11 +79,6 @@ end
 # Data
 # 
 # Notes: 
-# - We will not standardise the data
-# - Data is split into train, validate, and test. Train will be used to specify 
-#   the mcmc parameters and estimate the chains, validate will be used to
-#   tune any parameters, possibly including the mcmc parameters, and test will
-#   only be touched ones: Although you kind of have to trust me here. 
 # ------------------------------------------------------------------------------
 
 x, y, dates = get_x_y_dates(;subsequence_length = 22)
@@ -93,12 +88,6 @@ train, validate, test = split_train_validate_test(x, y, dates)
 # RNN-HAR MAP
 # 
 # Notes:
-# - Network structure does not seem to matter. Those are already bad news,
-# since it likely means that our network is not learning anything complicated
-# and is thus unlikely to outperform the simple linear model. 
-# - I went for RNN(1, 3), Dense(3, 4) because it didn't perform much worse than
-#   the others and is small.
-# - Using this structure we find time variation but that looks rather random and 
 # ------------------------------------------------------------------------------
 Random.seed!(6150533)
 
@@ -191,26 +180,6 @@ serialize("./outputs/rnn-har-map-test-rmse.jld", rmse)
 # Variational Inference via Bayes By Backprop
 # 
 # Notes: 
-# - BBB has shown good performance on simulated data. Does it perform equally
-#   well on real data? 
-# - RMSE on training data is 0.558 and only minimal time variation is observable
-# - For the training data, the quantile comparison plot shows slightly too low
-#   lower quantiles and slightly too high upper quantiles but all in all it
-#   looks reasonable. 
-# - RMSE for validation data is 0.674. The predictions look largely just like
-#   a somewhat scaled last value (AR1 model); Coefficients are not moving in any
-#   significant manner; Quantile comparison plot shows a good performance but
-#   generally also that lower quantiles are too high and upper quantiles are
-#   slightly too low. 
-# - Generally the results seem to point towards no time variation in
-#   coefficients, but nevertheless good performance of the model when estimated
-#   using BBB. It also shows a good fit with the data when using quantile
-#   comparison plots, and thus we seem to match the uncertainty in our
-#   predictions well. That does not neccessarily mean that we match the
-#   posterior of the network paramters well though. This is rather unlikley do
-#   to the known topological issues. Since we are not interested in parameter
-#   space but rather in coeffcient and predictive space, we do not care about
-#   the former given our good results in the predictive performance tests.  
 # ------------------------------------------------------------------------------
 Random.seed!(6150533)
 q, params, losses = bbb(bnn, 10, 500; mc_samples = 1, opt = Flux.ADAM())
@@ -303,9 +272,6 @@ savefig(p, "./outputs/rnn-har-bbb-qqplot-test.pdf")
 # RNN-HAR Full Bayesian
 # 
 # Notes: 
-# - Estimation method was tuned using bisection to find appropriate steplength
-#   and additionally by hand to obtain quantile comparison plots with good
-#   perfomance on the training data. 
 # ------------------------------------------------------------------------------
 
 function cal_chain_stats(bnn, ch)
